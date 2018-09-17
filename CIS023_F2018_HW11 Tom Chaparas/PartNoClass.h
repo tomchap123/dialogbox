@@ -15,6 +15,6 @@ public:
 	TCHAR* GetPartNo();
 
 private:
-	TCHAR szPartNo[100];				//stores 
+	TCHAR szPartNo[100]; 
 };
 

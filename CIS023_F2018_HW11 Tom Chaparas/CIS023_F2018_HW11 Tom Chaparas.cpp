@@ -13,22 +13,18 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+HINSTANCE hInst;                         // current instance
+WCHAR szTitle[MAX_LOADSTRING];           // The title bar text
+WCHAR szWindowClass[MAX_LOADSTRING];     // the main window class name
 
-HWND hWnd_PartNum;								//handle to edit controls/Data Input box
-HWND hWnd_Description;							//
-HWND hWnd_Quantity;								//
+TCHAR szUserInput[200];                  //Global variables to hold input data
+TCHAR szPartNum[200];	
+TCHAR szDescription[200];                //
+int iQuantity;                           //
+BOOL ConversionSucceeded;                //
 
-TCHAR szUserInput[200];
-TCHAR szPartNum[200];							//Global variables to hold input data
-TCHAR szDescription[200];						//
-int iQuantity;									//
-BOOL ConversionSucceeded;
-
-DescriptionClass* DescriptionObject;			//Object derived base PartNoClass 
-QuantityClass* QuantityObject;					// 
+DescriptionClass* DescriptionObject;     //Object derived base PartNoClass 
+QuantityClass* QuantityObject;           // 
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -36,8 +32,9 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-//Declcaration of Callback function created for Dialog boxes
+//Declaration of Callback function created for Dialog boxes
 INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK View(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -153,39 +150,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
-			case ID_FILE_ADD:
-			{
-				DialogBox(								//launch Data Input dialog box
-					hInst,								//attached to this program
-					MAKEINTRESOURCE(IDD_InputDialog),	//the Input Dialog box
-					hWnd,								//child of this program
-					Input);								//name of Callback function
-			}
-			break;
-			case ID_FILE_VIEW:
-			{
-				DialogBox(								//launch Data View dialog box
-					hInst,								//attached to this program
-					MAKEINTRESOURCE(IDD_ViewDialog),	//the View Dialog box
-					hWnd,								//child of this program
-					Input);								//name of Callback function	
+            case ID_FILE_ADD:
+            {
+                DialogBox(                              //launch Data Input dialog box
+                    hInst,                              //attached to this program
+                    MAKEINTRESOURCE(IDD_InputDialog),   //the Input Dialog box
+                    hWnd,                               //child of this program
+                    Input);                             //name of Callback function
+            }
+            break;
+            case ID_FILE_VIEW:
+            {
+                DialogBox(                              //launch Data View dialog box
+                    hInst,                              //attached to this program
+                    MAKEINTRESOURCE(IDD_ViewDialog),    //the View Dialog box
+                    hWnd,                               //child of this program
+                    View);                              //name of Callback function	
 
-				SetWindowText(							//Set text in View edit controls
-					hWnd_PartNum,						//handle to control
-					DescriptionObject->					//value from class to be displayed
-					GetPartNo());
-
-				SetWindowText(							//Set text in View edit controls
-					hWnd_Description,					//handle to control
-					DescriptionObject->					//value from class to be displayed
-					GetDescription());					
-
-				SetWindowText(
-					hWnd_Quantity,
-					(TCHAR*)QuantityObject->
-					GetQuantity());
-			}
-			break;
+            }
+            break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
@@ -205,18 +188,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
-	case WM_CREATE:
-	{
+    case WM_CREATE:
+    {
 
-		DescriptionObject = new DescriptionClass;		//Objects created
-		QuantityObject = new QuantityClass;				//
-	}
-	break;
+        DescriptionObject = new DescriptionClass;   //Object created
+        QuantityObject = new QuantityClass;         //Object created
+    }
+    break;
     case WM_DESTROY:
-		if (DescriptionObject)
-			delete DescriptionObject;
-		if (QuantityObject)
-			delete QuantityObject;
+        if (DescriptionObject)
+            delete DescriptionObject;               //Object destroyed
+        if (QuantityObject)
+            delete QuantityObject;                  //Object destroyed
 
         PostQuitMessage(0);
         break;
@@ -248,94 +231,105 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 //Message Handler for InputBox
 INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-		// dialog box is created
-	case WM_INITDIALOG:
-		
-		
-		return (INT_PTR)TRUE;
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        
+        return (INT_PTR)TRUE;
 
-	case WM_COMMAND:
+    case WM_COMMAND:
 
-		//Save/OK Button
-		if (LOWORD(wParam) == IDOK)
-		{
+        //Save/OK Button
+        if (LOWORD(wParam) == IDOK)
+        {
+            GetDlgItemText(                //get text item in dialogbox
+                hDlg,                      //handle to the dialogbox
+                IDC_PartEdit,              //control ID in the dialog box
+                DescriptionObject->        //return value from object
+                GetPartNo(),								
+                200);                      //max # of chars to get
+            
 
-			GetDlgItemText(								//get text item in dialogbox
-				hDlg,									//handle to the dialogbox
-				IDC_PartEdit,							//which item in the dialog box
-				DescriptionObject->
-				GetPartNo(),								//
-				200);									//max # of chars to get
-			
+            GetDlgItemText(								
+                hDlg,									
+                IDC_DescriptEdit,						
+                DescriptionObject->
+                GetDescription(),							
+                200);									
 
-			GetDlgItemText(								//get text item in dialogbox
-				hDlg,									//handle to the dialogbox
-				IDC_DescriptEdit,						//which item in the dialog box
-				DescriptionObject->
-				GetDescription(),							//target TCHAR
-				200);									//max # of chars to get
+            iQuantity = GetDlgItemInt(      //get int item in dialogbox					
+                hDlg,                       //handle									
+                IDC_QuantityEdit,           //control ID
+                &ConversionSucceeded,       //					
+                TRUE);									
+            
+            if (ConversionSucceeded)
+            {
+                QuantityObject->SetQuantity(iQuantity);
+            }
 
-			iQuantity = GetDlgItemInt(					//get text item in dialogbox
-				hDlg,									//handle to the dialogbox
-				IDC_QuantityEdit,
-				&ConversionSucceeded,					//which item in the dialog box
-				TRUE);									//target variable
-			
-			if (ConversionSucceeded)
-			{
-				QuantityObject->SetQuantity(iQuantity);
-			}
+            EndDialog(hDlg, LOWORD(wParam));   //Close dialog box
+            return (INT_PTR)TRUE;
+        
+        }
 
-			EndDialog(hDlg, LOWORD(wParam));			//Close dialog box
-			return (INT_PTR)TRUE;
-		
-		}
-
-		//Cancel Button
-		if (LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
+        //Cancel Button
+        if (LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
 }
+//Message handler for View box
 INT_PTR CALLBACK View(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-		// dialog box is created
-	case WM_INITDIALOG:
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+        // dialog box is created
+    case WM_INITDIALOG:
 
+        SetDlgItemText(              //set item in View dialogox
+            hDlg,                    //dialogbox handle
+            IDC_ViewPart,            //control ID
+            DescriptionObject->      //retrieving data from object
+            GetPartNo());
 
-		return (INT_PTR)TRUE;
+        SetDlgItemText(
+            hDlg,
+            IDC_ViewDescript,
+            DescriptionObject->
+            GetDescription());
 
-	case WM_COMMAND:
+        SetDlgItemInt(
+            hDlg,
+            IDC_ViewQuantity,
+            QuantityObject->
+            GetQuantity(),
+            TRUE);
+            
+        return (INT_PTR)TRUE;
 
-		//Save/OK Button
-		if (LOWORD(wParam) == IDOK)
-		{
+    case WM_COMMAND:
 
-			
-
-			EndDialog(hDlg, LOWORD(wParam));			//Close dialog box
-			return (INT_PTR)TRUE;
-
-		}
-
-		//Cancel Button
-		if (LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
+       //Close dialog box
+        if (LOWORD(wParam) == IDOK)
+        {
+            EndDialog(hDlg, LOWORD(wParam));			
+            return (INT_PTR)TRUE;
+        }
+        //Cancel Button
+        if (LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
 }
 

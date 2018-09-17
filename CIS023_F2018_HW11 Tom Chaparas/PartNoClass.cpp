@@ -18,7 +18,7 @@ PartNoClass::~PartNoClass()
 
 void PartNoClass::SetPartNo(TCHAR* szInput)
 {
-	_tcscpy_s(szPartNo, szInput);			//store input in szPartNo
+	_tcscpy_s(szPartNo, szInput);   //store input in szPartNo
 }
 
 TCHAR* PartNoClass::GetPartNo()

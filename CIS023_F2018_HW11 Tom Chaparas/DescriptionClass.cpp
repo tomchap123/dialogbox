@@ -18,7 +18,7 @@ DescriptionClass::~DescriptionClass()
 
 void DescriptionClass::SetDescription(TCHAR *szInput)
 {
-	_tcscpy_s(szDescription, szInput);			//store input in szDescription
+	_tcscpy_s(szDescription, szInput);   //store input in szDescription
 }
 
 TCHAR * DescriptionClass::GetDescription()
