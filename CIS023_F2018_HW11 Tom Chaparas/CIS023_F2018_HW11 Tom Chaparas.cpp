@@ -253,22 +253,8 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		// dialog box is created
 	case WM_INITDIALOG:
-		//save data to Objects
-		SetDlgItemText(									//put text in dialogbox control
-			hDlg,										//handle to dialogbox
-			IDC_ViewPart,								//edit control in box
-			szPartNum);									//source TCHAR
-
-		SetDlgItemText(									//put text in dialogbox control
-			hDlg,										//handle to dialogbox
-			IDC_ViewDescript,							//edit control in box
-			szDescription);								//source TCHAR
-
-		SetDlgItemText(									//put text in dialogbox control
-			hDlg,										//handle to dialogbox
-			IDC_ViewQuantity,							//edit control in box
-			(TCHAR*)iQuantity);							//source 
-
+		
+		
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
@@ -284,8 +270,6 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetPartNo(),								//
 				200);									//max # of chars to get
 			
-			//DescriptionObject->SetPartNo(szUserInput);
-			//_tcscpy_s(szPartNum, DescriptionObject->GetPartNo());
 
 			GetDlgItemText(								//get text item in dialogbox
 				hDlg,									//handle to the dialogbox
@@ -304,6 +288,7 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				QuantityObject->SetQuantity(iQuantity);
 			}
+
 			EndDialog(hDlg, LOWORD(wParam));			//Close dialog box
 			return (INT_PTR)TRUE;
 		
@@ -319,5 +304,38 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return (INT_PTR)FALSE;
 }
+INT_PTR CALLBACK View(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+		// dialog box is created
+	case WM_INITDIALOG:
 
+
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+
+		//Save/OK Button
+		if (LOWORD(wParam) == IDOK)
+		{
+
+			
+
+			EndDialog(hDlg, LOWORD(wParam));			//Close dialog box
+			return (INT_PTR)TRUE;
+
+		}
+
+		//Cancel Button
+		if (LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
 
