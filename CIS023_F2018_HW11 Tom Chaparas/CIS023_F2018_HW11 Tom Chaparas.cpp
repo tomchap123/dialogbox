@@ -21,9 +21,11 @@ HWND hWnd_PartNum;								//handle to edit controls/Data Input box
 HWND hWnd_Description;							//
 HWND hWnd_Quantity;								//
 
+TCHAR szUserInput[200];
 TCHAR szPartNum[200];							//Global variables to hold input data
 TCHAR szDescription[200];						//
 int iQuantity;									//
+BOOL ConversionSucceeded;
 
 DescriptionClass* DescriptionObject;			//Object derived base PartNoClass 
 QuantityClass* QuantityObject;					// 
@@ -274,9 +276,6 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		//Save/OK Button
 		if (LOWORD(wParam) == IDOK)
 		{
-			DescriptionObject->SetPartNo(szPartNum);		//store data collected from dialogbox input
-			DescriptionObject->SetDescription(szDescription);//
-			QuantityObject->SetQuantity(iQuantity);			//
 
 			GetDlgItemText(								//get text item in dialogbox
 				hDlg,									//handle to the dialogbox
@@ -284,6 +283,9 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				DescriptionObject->
 				GetPartNo(),								//
 				200);									//max # of chars to get
+			
+			//DescriptionObject->SetPartNo(szUserInput);
+			//_tcscpy_s(szPartNum, DescriptionObject->GetPartNo());
 
 			GetDlgItemText(								//get text item in dialogbox
 				hDlg,									//handle to the dialogbox
@@ -292,13 +294,16 @@ INT_PTR CALLBACK Input(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDescription(),							//target TCHAR
 				200);									//max # of chars to get
 
-			GetDlgItemText(								//get text item in dialogbox
+			iQuantity = GetDlgItemInt(					//get text item in dialogbox
 				hDlg,									//handle to the dialogbox
-				IDC_QuantityEdit,						//which item in the dialog box
-				(TCHAR*)QuantityObject->
-				GetQuantity(),							//target variable
-				200);											
-
+				IDC_QuantityEdit,
+				&ConversionSucceeded,					//which item in the dialog box
+				TRUE);									//target variable
+			
+			if (ConversionSucceeded)
+			{
+				QuantityObject->SetQuantity(iQuantity);
+			}
 			EndDialog(hDlg, LOWORD(wParam));			//Close dialog box
 			return (INT_PTR)TRUE;
 		
